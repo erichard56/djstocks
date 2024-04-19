@@ -1,0 +1,54 @@
+{% extends 'header.html' %}
+
+{% load static %}
+
+{% block cuerpo %}
+		
+<div class="wrapper-pad">
+	<h2>Editar producto (ID {{ item.0.id }})</h2>
+
+	<div class="center">
+		<div class="new-item form">
+			<form method="post" action="" enctype="multipart/form-data" name="edit-item" data-id="{{ item.0.id }}">
+				{% csrf_token %}
+				Nombre: <br />
+				<div class="ni-cont">
+					<input type="text" name="item-name" class="ni" value="{{ item.0.name }}" />
+				</div>
+				<span class="item-desc-left">Descripción ({{ restan }} caracteres restantes):</span><br />
+				<div class="ni-cont">
+					<textarea name="item-descrp" class="ni">{{ item.0.descrp }}</textarea>
+				</div>
+				Depósito:<br />
+					<div class="select-holder">
+					<i class="fa fa-caret-down"></i>
+					{% if depositos %}
+						<select name="item-category">
+							{% for deposito in depositos %}
+								<option value="{{ deposito.id }}"">{{ deposito.name }}</option>
+							{% endfor %}
+						</select>
+					{% else %}
+						<select name="item-category" disabled><option val="no">Debe crear un Depósito primero</option></select>
+					{% endif %}
+				</div>
+				Precio:<br />
+				<input type="text" name="item-price" class="ni-small" placeholder="0.00" value="{{ item.0.price }}" /> <br>
+				Precio de Venta:<br />
+				<input type="text" name="item-price_venta" class="ni-small" placeholder="0.00" value="{{ item.0.price_venta }}" /> <br>
+				Imagen: <br>
+				<img src="{% get_media_prefix %}{{ item.0.imagen }}" heigth='42'  width='42' />
+				<input type="submit" name="item-submit" class="ni btn blue" value="Guardar datos" />
+			</form>
+		</div>
+	</div>
+</div>
+		
+	<div class="clear" style="margin-bottom:40px;"></div>
+	<div class="border" style="margin-bottom:30px;"></div>
+
+</div>
+
+{% endblock %}
+</body>
+</html>

@@ -1,0 +1,38 @@
+{% extends 'header.html' %}
+
+{% load static %}
+
+{% block cuerpo %}
+
+<div class="wrapper-pad">
+	<h2>Editar Depósito</h2>
+
+	<div class="center">
+		<div class="form">
+			<form method="POST" action="" name="edit-cat" data-id={{ deposito.id }}>
+				{% csrf_token %}
+				Nombre del Depósito:<br />
+				<div class="ni-cont">
+					<input type="text" name="ndep-name" class="ni" value={{ deposito.name }} />
+				</div>
+				Lugar del Depósito:<br />
+				<div class="ni-cont">
+					<input type="text" name="ndep-place" class="ni" value={{ deposito.place }} />
+				</div>
+				<span class="ndep-desc-left">Descripción del Depósito ({{ restan }} caracteres restantes):</span><br />
+				<div class="ni-cont">
+					<textarea name="ndep-descrp" class="ni">{{ deposito.descrp }}</textarea>
+				</div>
+				<input type="submit" name="ndep-submit" class="ni btn blue" value="Guardar datos" />
+			</form>
+		</div>
+	</div>
+</div>
+	
+<div class="clear" style="margin-bottom:40px;"></div>
+<div class="border" style="margin-bottom:30px;"></div>
+
+{% endblock %}
+
+</body>
+</html>

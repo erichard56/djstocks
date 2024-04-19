@@ -1,0 +1,77 @@
+{% extends 'header.html' %}
+
+{% load static %}
+
+{% block cuerpo %}
+		<div class="wrapper-pad">
+			<h2>Inicio</h2>
+			<ul id="selectors">
+				<li class="selected" value="today">HOY</li>
+				<li value="this_week">ESTA SEMANA</li>
+				<li value="this_month">ESTE MES</li>
+				<li value="this_year">ESTE AÑO</li>
+				<li value="all_time">TODOS</li>
+			</ul>
+			
+			<div id="fdetails">
+				<div class="element">
+					<span>{{ get_new_items.0 }}</span><br />
+					NUEVOS<br />
+					PRODUCTOS
+				</div>
+				<div class="element">
+					<span>{{ get_checked_in.0 }}</span><br />
+					INGRESOS<br />
+					(CANT. TOTAL)
+				</div>
+				<div class="element">
+					<span>{{ get_checked_out.0 }}</span><br />
+					SALIDAS<br />
+					(CANT TOTAL)
+				</div>
+				<div class="element">
+					<span>${{ get_checked_in_price.0|floatformat:2 }}</span><br />
+					INGRESOS
+				</div>
+				<div class="element">
+					<span>${{ get_checked_out_price.0|floatformat:2 }}</span><br />
+					SALIDAS
+				</div>
+			</div>
+		</div>
+		
+		<div class="clear" style="margin-bottom:40px;height:1px;"></div>
+		<div class="border" style="margin-bottom:30px;"></div>
+		
+		<div class="wrapper-pad">
+			<h3>ESTADÍSTICAS GENERALES</h3>
+			<div id="f2details">
+				<div class="element">
+					<span>{{ general_registered_items }}</span><br />
+					PRODUCTOS<br />
+					REGISTRADOS
+				</div>
+				<div class="element">
+					<span>{{ general_warehouse_items }}</span><br />
+					ALMACÉN<br />
+					PRODUCTO (CANT)
+				</div>
+				<div class="element">
+					<span>${{ general_warehouse_value|floatformat:2 }}</span><br />
+					VALOR EN ALMACÉN
+				</div>
+				<div class="element">
+					<span>${{ general_warehouse_checked_out|floatformat:2 }}</span><br />
+					VALOR SALIDAS
+				</div>
+			</div>
+		</div>
+		
+		<div class="clear" style="height:50px;"></div>
+	</div>
+
+
+	{% endblock %}
+
+</body>
+</html>

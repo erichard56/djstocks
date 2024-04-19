@@ -1,0 +1,65 @@
+{% load static %}
+
+<!DOCTYPE HTML>
+<html>
+
+	<meta charset="utf-8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+	<title>djStocks</title>
+
+	<link type="text/css" rel="stylesheet" href="{% static 'media/css/home.css' %}" media="all" />
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,600" rel="stylesheet" type="text/css">
+	<link rel="icon" href="{% static 'mystock/favicon.ico' %}" type="image/x-icon" />
+
+	<script type="text/javascript" src="{% static 'media/js/jquery.min.js' %}"></script>
+
+<body>
+	<div id="main-wrapper">
+		<div id="header">
+			<div class="left">
+				<a href="https://google.com/" target='_blank'><img src="{% static 'mystock/logo3x.png' %}" width="150" height="50" alt="mStock" /></a>
+				<div style="font-size:12px; font-style:italic;color:#bbb;">{{ datos.1 }}</div>
+			</div>
+			<div class="right">
+				{% if datos.0 == 1 or datos.0 == 2 or datos.0 == 3 %}
+					<a href="users.php" title="Users">Usuarios</a>|
+				{% endif %}
+				<a href="settings.php" title="Settings">Configuración</a>|
+				<a href="{% url 'salir' %}" title="Logout">Salir</a>
+			</div>
+
+			<div class="clear"></div>
+		</div>
+
+		<input type="checkbox" class="toggle" id="opmenu" style="display:none"/>
+		<label for="opmenu" id="open-menu"><i class="fa fa-align-justify"></i> Menu</label>
+
+		<div id="menu">
+			<ul id="menuli">
+				<!-- // Home only for Admin and General Supervisor (Stats) -->
+				{% if datos.0 == 1 or datos.0 == 2 %}
+					<li {% if pagina == 1 %} class="active" {% endif %}><a href="{% url 'home' %}" title="Home"><i class="fa fa-home"></i> Inicio</a></li>
+				{% endif %}
+
+				<!-- // Add Item only for Admin, General Supervisor and Supervisor -->
+				{% if datos.0 == 1 or datos.0 == 2 or datos.0 == 3 %}
+					<li {% if pagina == 2 %} class="active" {% endif %}><a href="{% url 'new_item' %}" title="New Item"><i class="fa fa-plus"></i> Nuevo producto</a></li>
+				{% endif %}
+
+				<li {% if pagina == 3 %} class="active" {% endif %}><a href="{% url 'items' %}" title="Items"><i class="fa fa-list-ul"></i> Productos</a></li>
+				<li {% if pagina == 4 %} class="active" {% endif %}><a href="check-in.php" title="Check-In Item"><i class="fa fa-arrow-down"></i> Ingresos</a></li>
+				<li {% if pagina == 5 %} class="active" {% endif %}><a href="check-out.php" title="Check-Out Item"><i class="fa fa-arrow-up"></i> Salidas</a></li>
+
+				<!-- // Add Item only for Admin, General Supervisor and Supervisor -->
+				{% if datos.0 == 1 or datos.0e == 2 or datos.0 == 3 %}
+					<li {% if pagina == 6 %} class="active" {% endif %}><a href="{% url 'logs' %}" title="Logs"><i class="fa fa-file-text-o"></i> Logs</a></li>
+				{% endif %}
+
+				<li {% if pagina == 7 %} class="active" {% endif %}><a href="{% url 'deposito' %}" title="Depósitos"><i class="fa fa-folder"></i> Depósitos</a></li>
+			</ul>
+		</div>
+
+		{% block cuerpo %}
+		{% endblock %}

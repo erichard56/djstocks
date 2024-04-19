@@ -1,0 +1,32 @@
+{% extends 'header.html' %}
+
+{% load static %}
+
+{% block cuerpo %}
+
+<div class="wrapper-pad">
+	<h2>Alta / Modificacion Depósito (ID {{ id }})</h2>
+
+	<div class="center">
+		<div class="new-item form">
+			<div class="form-group"></div>
+				<form method="post" action="" name="ab-deposito" enctype='multipart/form-data'>
+					{% csrf_token %}
+					<br>
+					{{ form.as_p }}
+					<br>
+					<input type="submit" name="deposito-submit" class="ni btn blue" value="Guardar datos" />
+					<br><br>
+				</form>
+			</div>
+		</div>
+	</div>
+		
+	<div class="clear" style="margin-bottom:40px;"></div>
+	<div class="border" style="margin-bottom:30px;"></div>
+
+</div>
+{% endblock %}
+
+</body>
+</html>
