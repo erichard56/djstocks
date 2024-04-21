@@ -5,17 +5,21 @@
 {% block cuerpo %}
 
 		<div class="wrapper-pad">
-			<h2>Nuevo Depósito</h2>
+			{% if id == 0 %}
+				<h2>Nuevo producto</h2>
+			{% else %}
+				<h2>Modificacion Producto (ID {{ id }})</h2>
+			{% endif %}
 
 			<div class="center">
 				<!-- <div class="new-item form"> -->
 				<div class="form-group"></div>
-					<form method="post" action="/ab_deposito/0" name="ab-deposito" enctype='multipart/form-data'>
+					<form method="post" action="" name="new-item" enctype='multipart/form-data'>
 						{% csrf_token %}
 						<br>
 						{{ form.as_p }}
 						<br>
-						<input type="submit" name="deposito-submit" class="ni btn blue" value="Guardar datos" />
+						<input type="submit" name="item-submit" class="ni btn blue" value="Guardar datos" />
 						<br><br>
 					</form>
 				</div>

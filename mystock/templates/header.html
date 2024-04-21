@@ -45,7 +45,7 @@
 
 				<!-- // Add Item only for Admin, General Supervisor and Supervisor -->
 				{% if datos.0 == 1 or datos.0 == 2 or datos.0 == 3 %}
-					<li {% if pagina == 2 %} class="active" {% endif %}><a href="{% url 'new_item' %}" title="New Item"><i class="fa fa-plus"></i> Nuevo producto</a></li>
+					<li {% if pagina == 2 %} class="active" {% endif %}><a href="{% url 'ab_item' 0 %}" title="New Item"><i class="fa fa-plus"></i> Nuevo producto</a></li>
 				{% endif %}
 
 				<li {% if pagina == 3 %} class="active" {% endif %}><a href="{% url 'items' %}" title="Items"><i class="fa fa-list-ul"></i> Productos</a></li>

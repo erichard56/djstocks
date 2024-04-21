@@ -46,7 +46,7 @@
 							<a href="" name="c1" title="Ingreso"><i class="fa fa-arrow-down"></i></a>
 							<a href="" name="c2" title="Salida"><i class="fa fa-arrow-up"></i></a>
 							{% if datos.0 == 1 or datos.0 == 2 %}
-								<a href="{% url 'edit_item' item.id %}" name="c3" title="Editar"><i class="fa fa-pencil"></i></a>
+								<a href="{% url 'ab_item' item.id %}" name="c3" title="Editar"><i class="fa fa-pencil"></i></a>
 							{% endif %}
 							{% if datos.0 == 1 or datos.0 == 2 or datos.0 == 3 %}
 								<a href="{% url 'log' item.id %}" name="c4" title="Log"><i class="fa fa-file-text-o"></i></a>

@@ -5,7 +5,7 @@
 {% block cuerpo %}
 
 <div class="wrapper-pad">
-	<h2>Logs</h2>
+	<h2>Logs {{ deposito }}</h2>
 
 	<div id="table-head">
 		<table border="1" rules="rows" id="logs">
@@ -24,9 +24,6 @@
 				
 			<tbody>
 				{% for log in logs %}
-					{% if log.id == 64 %}
-						id {{ log.id }} type {{ log.type }} type_id {{ log.type.id }} <br>
-					{% endif %}
 					<tr data-id="{{ log.id }}">
 						<td>{{ log.id }}</td>
 						<td>{{ log.type }}</td>

@@ -11,6 +11,7 @@ from os.path import exists
 from datetime import datetime
 from PIL import Image
 from io import BytesIO
+from django.db.models import Subquery
 
 # Create your views here.
 
@@ -174,36 +175,6 @@ def sign_out(request):
 	return redirect('/login/')
 
 @login_required
-def new_item(request):
-	user = request.user
-	usuario = Usuario.objects.get(id = user.id)
-
-	if(usuario.role == 4):
-		return(redirect('items/'))
-
-	if (request.method == 'GET'):
-		form = ItemForm()
-		ctx = {'pagina':2,
-			'datos':[usuario.role.id, usuario.role.name],
-			'form':form}
-		return(render(request, 'new_item.html', ctx))
-
-	elif (request.method == 'POST'):
-		form = ItemForm(request.POST, request.FILES)
-        
-		if (form.is_valid()):
-			form.save()
-			return redirect('/items/')
-        
-		messages.error(request,f'Datos inválidos')
-		return(render(request,'new_item.html', {'form':form}))
-
-	ctx = {'pagina':2,
-		'datos':[usuario.role.id, usuario.role.name],
-		'depositos':depositos}
-	return(render(request, 'items.html', ctx))
-
-@login_required
 def items(request):
 	user = request.user
 	usuario = Usuario.objects.get(id = user.id)
@@ -218,6 +189,50 @@ def items(request):
 		'datos':[usuario.role.id, usuario.role.name],
 		'items':items}
 	return(render(request, 'items.html', ctx))
+
+@login_required
+def ab_item(request, id):
+	user = request.user
+	usuario = Usuario.objects.get(id = user.id)
+
+	if(usuario.role == 4):
+		return(redirect('items/'))
+
+	if (request.method == 'GET'):
+		if (id == 0):
+			form = ItemForm()
+		else:
+			item = Item.objects.get(pk = id)
+			form = ItemForm(initial={
+				'name':item.name, 'descrp':item.descrp, 'qty':item.qty, 
+				'price':item.price, 'price_venta':item.price_venta, 
+				'deposito':item.deposito_id, 'imagen':item.imagen})
+		ctx = {'pagina':2,
+			'datos':[usuario.role.id, usuario.role.name],
+			'id':id, 
+			'form':form}
+		return(render(request, 'ab_item.html', ctx))
+
+	elif (request.method == 'POST'):
+		form = ItemForm(request.POST, request.FILES)
+		if (form.is_valid()):
+			if (id == 0):
+				form.save()
+			else:
+				item = Item.objects.get(pk = id)
+				item.name = request.POST['name']
+				item.descrp = request.POST['descrp']
+				item.qty = request.POST['qty']
+				item.price = request.POST['price']
+				item.price_venta = request.POST['price_venta']
+				item.deposito_id = request.POST['deposito']
+				item.imagen = request.FILES['imagen']
+				item.save()
+		else:
+			print('form invalido')
+			for e in form.errors:
+				print('error', e)
+	return(redirect('items'))
 
 
 def deposito(request):
@@ -292,55 +307,6 @@ def eliminar_deposito(request, id):
 	return(redirect('deposito'))
 
 @login_required
-def new_deposito(request):
-	user = request.user
-	usuario = Usuario.objects.get(id = user.id)
-
-	# // Only Admin and General Supervisor can edit depositos
-	if(usuario.role.id != 1 and usuario.role.id != 2):
-		return(redirect('deposito'))
-
-	if (request.method == 'GET'):
-		form = DepositoForm(initial={'name':'', 'place':'', 'descrp':''})
-		ctx = {'pagina':14,
-			'datos':[usuario.role.id, usuario.role.name],
-			'form':form }
-		return(render(request, 'new_deposito.html', ctx))
-
-	elif (request.method == 'POST'):
-		form = DepositoForm(request.POST, request.FILES)
-		if (form.is_valid()):
-			form.save()
-			return redirect('/deposito/')
-
-		return(redirect('deposito'))
-
-@login_required
-def edit_deposito(request, id):
-	user = request.user
-	usuario = Usuario.objects.get(id = user.id)
-
-	# // Only Admin and General Supervisor can edit depositos
-	if(usuario.role.id != 1 and usuario.role.id != 2):
-		return(redirect('deposito'))
-
-	if (request.method == 'GET'):
-		deposito = Deposito.objects.get(pk = id)
-		ctx = {'pagina':14,
-			'datos':[usuario.role.id, usuario.role.name],
-			'deposito':deposito,
-			'restan':400 - len(deposito.descrp) }
-		return(render(request, 'edit_deposito.html', ctx))
-
-	elif (request.method == 'POST'):
-		deposito = Deposito.objects.get(pk = id)
-		deposito.name = request.POST['ndep-name']
-		deposito.place = request.POST['ndep-place']
-		deposito.descrp = request.POST['ndep-descrp']
-		deposito.save()
-		return(redirect('deposito'))
-
-@login_required
 def logs(request):
 
 	user = request.user
@@ -352,6 +318,7 @@ def logs(request):
 	logs = Log.objects.all().order_by('item')
 	ctx = {'pagina':6,
 			'datos':[usuario.role.id, usuario.role.name],
+			'deposito':'(TODOS)',
 			'logs':logs}
 	return(render(request, 'logs.html', ctx))
 
@@ -364,35 +331,14 @@ def log(request, id):
 	if (usuario.role == 4):
 		return(redirect('items'))
 
-	logs = Log.objects.filter(item_id = id).order_by('item', 'id')
+	deposito = Deposito.objects.get(id = id)
+	items = Item.objects.filter(deposito_id = id)
+	logs = Log.objects.filter(item_id__in = Subquery(items.values('id')))
 	ctx = {'pagina':6,
 			'datos':[usuario.role.id, usuario.role.name],
+			'deposito':'(' + deposito.name + ')', 
 			'logs':logs}
 	return(render(request, 'logs.html', ctx))
-
-@login_required
-def edit_item(request, id):
-	user = request.user
-	usuario = Usuario.objects.get(id = user.id)
-
-	if (request.method == 'GET'):
-		item = Item.objects.filter(id = id)
-		depositos = Deposito.objects.all().order_by('name')
-		restan = 400 - len(item[0].descrp)
-		ctx = {'pagina':6,
-				'datos':[usuario.role.id, usuario.role.name],
-				'item':item, 'restan':restan,
-				'depositos':depositos}
-		return(render(request, 'edit_item.html', ctx))
-
-	elif (request.method == 'POST'):
-		item = Item.objects.get(pk = id)
-		item.name = request.POST['item-name']
-		item.descrp = request.POST['item-descrp']
-		item.price = request.POST['item-price']
-		item.price_venta = request.POST['item-price_venta']
-		item.save()
-		return(redirect('items'))
 
 @login_required
 def eliminar_item(request, id):

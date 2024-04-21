@@ -11,7 +11,7 @@
 	
 		<div class="fright" style="height:5px; margin-right:55px;"></div>
 			{% if datos.0 == 1 or datos.0 == 2 %}
-				<a href="{% url 'new_deposito' %}" name="new-dep" class="btn blue fright"><i class="fa fa-plus"></i>Nuevo Depósito</a> <br>
+				<a href="{% url 'ab_deposito' 0 %}" name="new-dep" class="btn blue fright"><i class="fa fa-plus"></i>Nuevo Depósito</a> <br>
 			{% endif %}
 		</div>
 
@@ -38,7 +38,7 @@
 						<td>{{ deposito.4 }}</td>
 						<td>
 							{% if datos.0 == 1 or datos.0 == 2 %}
-								<a href="{% url 'edit_deposito' deposito.0 %}" name="c3" title="Edit ab-deposito"><i class="fa fa-pencil"></i></a>
+								<a href="{% url 'ab_deposito' deposito.0 %}" name="c3" title="Edit ab-deposito"><i class="fa fa-pencil"></i></a>
 							{% endif %}
 							{% if datos.0 == 1 or datos.0 == 2 or datos.0 == 3 %}
 								<a href="{% url 'log' deposito.0 %}" name="c4" title="Log de este Depósito"><i class="fa fa-file-text-o"></i></a>
