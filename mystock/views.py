@@ -331,9 +331,11 @@ def log(request, id):
 	if (usuario.role == 4):
 		return(redirect('items'))
 
-	deposito = Deposito.objects.get(id = id)
-	items = Item.objects.filter(deposito_id = id)
+	items = Item.objects.filter(id = id)
+	for i in items:
+		print('...', i.id, i.deposito_id)
 	logs = Log.objects.filter(item_id__in = Subquery(items.values('id')))
+	deposito = Deposito.objects.get(id = items[0].deposito_id)
 	ctx = {'pagina':6,
 			'datos':[usuario.role.id, usuario.role.name],
 			'deposito':'(' + deposito.name + ')', 
