@@ -7,50 +7,54 @@
 <div class="wrapper-pad">
 	<h2>Logs {{ deposito }}</h2>
 
+	<form method="post" action="" name="searchf">
+		{% csrf_token %}
+		<input type="text" name="busq" placeholder="Buscar..." class="search fleft" />
+	</form>
+	<br><br>
+
 	<div id="table-head">
-		<table border="1" rules="rows" id="logs">
-			<thead>
-				<tr>
-					<td width="6%">ID</td>
-					<td width="13%">Tipo</td>
-					<td width="25%">Producto</td>
-					<td width="10%">Imagen</td>
-					<td width="12%">Desde</td>
-					<td width="12%">Hasta</td>
-					<td width="20%">Usuario</td>
-					<td width="12%">Fecha</td>
-				</tr>
-			</thead>
-				
-			<tbody>
-				{% for log in logs %}
-					<tr data-id="{{ log.id }}">
-						<td>{{ log.id }}</td>
-						<td>{{ log.type }}</td>
-						<td>{{ log.item }}</td>
-						<td><img src="{% get_media_prefix %}{{ log.item.imagen }}" heigth='42'  width='42' /></td>
-						{% if log.type.id == 1 or log.type.id == 2 %}
-							<td>{{ log.fromqty }}</td>
-							<td>{{ log.toqty }}</td>
-						{% elif log.type.id == 3 %}
-							<td>{{ log.fromprice }}</td>
-							<td>{{ log.toprice }}</td>
-						{% else %}
-							<td> - </td>
-							<td> - </td>
-						{% endif %}
-						<td>{{ log.user }}</td>
-						<td>{{ log.date_added|date:'d-m-Y' }}</td>
-					</tr>
-				{% endfor %}
-			</tbody>
-		</table>
 	</div>
+	<table border="1" rules="rows" id="logs">
+		<thead>
+			<tr>
+				<td width="6%">ID</td>
+				<td width="13%">Tipo</td>
+				<td width="25%">Producto</td>
+				<td width="10%">Imagen</td>
+				<td width="12%">Desde</td>
+				<td width="12%">Hasta</td>
+				<td width="20%">Usuario</td>
+				<td width="12%">Fecha</td>
+			</tr>
+		</thead>
+			
+		<tbody>
+			{% for log in logs %}
+				<tr data-id="{{ log.id }}">
+					<td>{{ log.id }}</td>
+					<td>{{ log.type }}</td>
+					<td>{{ log.producto }}</td>
+					<td><img src="{% get_media_prefix %}{{ log.producto.imagen }}" heigth='42'  width='42' /></td>
+					{% if log.type.id == 1 or log.type.id == 2 %}
+						<td>{{ log.fromqty }}</td>
+						<td>{{ log.toqty }}</td>
+					{% elif log.type.id == 3 %}
+						<td>{{ log.fromprice }}</td>
+						<td>{{ log.toprice }}</td>
+					{% else %}
+						<td> - </td>
+						<td> - </td>
+					{% endif %}
+					<td>{{ log.user }}</td>
+					<td>{{ log.date_added|date:'d-m-Y' }}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
 </div>
 
 <div class="clear" style="margin-bottom:40px;"></div>
 <div class="border" style="margin-bottom:30px;"></div>
 		
 {% endblock %}
-</body>
-</html>

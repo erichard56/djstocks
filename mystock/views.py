@@ -3,8 +3,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate, logout
 from datetime import date, timedelta
-from mystock.models import Log, Item, Usuario, Deposito
-from mystock.forms import LoginForm, ItemForm, DepositoForm
+from mystock.models import Log, Producto, Usuario, Deposito
+from mystock.forms import LoginForm, ProductoForm, DepositoForm
 from django.db.models import Sum, F
 from django.conf import settings
 from os.path import exists
@@ -21,13 +21,13 @@ def home(request):
 	hoy30 = hoy - timedelta(days = 30)
 	hoy365 = hoy - timedelta(days = 365)
 
-# get_new_items
-	today = Item.objects.filter(date_add = hoy).count()
-	this_week = Item.objects.filter(date_add__range = [hoy7, hoy]).count()
-	this_month = Item.objects.filter(date_add__range = [hoy30, hoy]).count()
-	this_year = Item.objects.filter(date_add__range = [hoy365, hoy]).count()
-	all_time = Item.objects.count()
-	get_new_items = [today, this_week, this_month, this_year, all_time]
+# get_new_productos
+	today = Producto.objects.filter(date_add = hoy).count()
+	this_week = Producto.objects.filter(date_add__range = [hoy7, hoy]).count()
+	this_month = Producto.objects.filter(date_add__range = [hoy30, hoy]).count()
+	this_year = Producto.objects.filter(date_add__range = [hoy365, hoy]).count()
+	all_time = Producto.objects.count()
+	get_new_productos = [today, this_week, this_month, this_year, all_time]
 
 #get_checked_in // Entrada
 	today = Log.objects.filter(date_added = hoy, type = 1).aggregate(today = Sum((F('toqty') - F('fromqty'))))['today']
@@ -101,16 +101,16 @@ def home(request):
 		all_time = 0
 	get_checked_out_price = [today, this_week, this_month, this_year, all_time]
 
-#general_registered_items
-	general_registered_items = Item.objects.count()
+#general_registered_productos
+	general_registered_productos = Producto.objects.count()
 
-#general_warehouse_items
-	general_warehouse_items = Item.objects.aggregate(Sum('qty'))['qty__sum']
-	if (general_warehouse_items is None):
-		general_warehouse_items = 0
+#general_warehouse_productos
+	general_warehouse_productos = Producto.objects.aggregate(Sum('qty'))['qty__sum']
+	if (general_warehouse_productos is None):
+		general_warehouse_productos = 0
 
 #general_warehouse_value
-	general_warehouse_value = Item.objects.aggregate(general_warehouse_value = Sum((F('qty') - F('price'))))['general_warehouse_value']
+	general_warehouse_value = Producto.objects.aggregate(general_warehouse_value = Sum((F('qty') - F('price'))))['general_warehouse_value']
 	if (general_warehouse_value is None):
 		general_warehouse_value = 0
 
@@ -135,11 +135,11 @@ def home(request):
 
 	ctx = {'pagina':1,
 	'datos':[usuario.role.id, usuario.role.name],
-	'get_new_items':get_new_items, 'get_checked_in':get_checked_in, 
+	'get_new_productos':get_new_productos, 'get_checked_in':get_checked_in, 
 	'get_checked_out':get_checked_out, 'get_checked_in_price':get_checked_in_price, 
 	'get_checked_out_price':get_checked_out_price, 
-	'general_registered_items':general_registered_items, 
-	'general_warehouse_items':general_warehouse_items, 
+	'general_registered_productos':general_registered_productos, 
+	'general_warehouse_productos':general_warehouse_productos, 
 	'general_warehouse_value':general_warehouse_value, 
 	'general_warehouse_checked_out':general_warehouse_checked_out}
 	return(render(request, 'home.html', ctx))
@@ -175,64 +175,79 @@ def sign_out(request):
 	return redirect('/login/')
 
 @login_required
-def items(request):
+def productos(request):
 	user = request.user
 	usuario = Usuario.objects.get(id = user.id)
 
 	if(usuario.role == 4):
-		return(redirect('items/'))
+		return(redirect('productos/'))
 
-	# // Search query
-	items = Item.objects.all().order_by('name')
+	if (request.method == 'GET'):
+		# // Search query
+		productos = Producto.objects.all().order_by('name')
 
-	ctx = {'pagina':3,
-		'datos':[usuario.role.id, usuario.role.name],
-		'items':items}
-	return(render(request, 'items.html', ctx))
+		ctx = {'pagina':3,
+			'datos':[usuario.role.id, usuario.role.name],
+			'productos':productos}
+		return(render(request, 'productos.html', ctx))
+
+	elif (request.method == 'POST'):
+		busq = request.POST['busq']
+		if (busq == ''):
+			productos = Producto.objects.all().order_by('name')
+		else:
+			productos = Producto.objects.filter(name__contains = busq).order_by('name')
+		for p in productos:
+			print('p', p.id, p.name)
+
+		ctx = {'pagina':3,
+			'datos':[usuario.role.id, usuario.role.name],
+			'productos':productos}
+		return(render(request, 'productos.html', ctx))
 
 @login_required
-def ab_item(request, id):
+def ab_producto(request, id):
 	user = request.user
 	usuario = Usuario.objects.get(id = user.id)
 
 	if(usuario.role == 4):
-		return(redirect('items/'))
+		return(redirect('productos/'))
 
 	if (request.method == 'GET'):
 		if (id == 0):
-			form = ItemForm()
+			form = ProductoForm()
 		else:
-			item = Item.objects.get(pk = id)
-			form = ItemForm(initial={
-				'name':item.name, 'descrp':item.descrp, 'qty':item.qty, 
-				'price':item.price, 'price_venta':item.price_venta, 
-				'deposito':item.deposito_id, 'imagen':item.imagen})
+			producto = Producto.objects.get(pk = id)
+			form = ProductoForm(initial={
+				'name':producto.name, 'descrp':producto.descrp, 'qty':producto.qty, 
+				'price':producto.price, 'price_venta':producto.price_venta, 
+				'deposito':producto.deposito_id, 'imagen':producto.imagen})
 		ctx = {'pagina':2,
 			'datos':[usuario.role.id, usuario.role.name],
 			'id':id, 
 			'form':form}
-		return(render(request, 'ab_item.html', ctx))
+		return(render(request, 'ab_producto.html', ctx))
 
 	elif (request.method == 'POST'):
-		form = ItemForm(request.POST, request.FILES)
+		form = ProductoForm(request.POST, request.FILES)
 		if (form.is_valid()):
 			if (id == 0):
 				form.save()
 			else:
-				item = Item.objects.get(pk = id)
-				item.name = request.POST['name']
-				item.descrp = request.POST['descrp']
-				item.qty = request.POST['qty']
-				item.price = request.POST['price']
-				item.price_venta = request.POST['price_venta']
-				item.deposito_id = request.POST['deposito']
-				item.imagen = request.FILES['imagen']
-				item.save()
+				producto = Producto.objects.get(pk = id)
+				producto.name = request.POST['name']
+				producto.descrp = request.POST['descrp']
+				producto.qty = request.POST['qty']
+				producto.price = request.POST['price']
+				producto.price_venta = request.POST['price_venta']
+				producto.deposito_id = request.POST['deposito']
+				producto.imagen = request.FILES['imagen']
+				producto.save()
 		else:
 			print('form invalido')
 			for e in form.errors:
 				print('error', e)
-	return(redirect('items'))
+	return(redirect('productos'))
 
 
 def deposito(request):
@@ -240,17 +255,17 @@ def deposito(request):
 	usuario = Usuario.objects.get(id = user.id)
 
 	if(usuario.role == 4):
-		return(redirect('items/'))
+		return(redirect('productos/'))
 
 	cat = []
 	depositos = Deposito.objects.all()
 	for deposito in depositos:
-		cont = Item.objects.filter(deposito_id = deposito.id).count()
+		cont = Producto.objects.filter(deposito_id = deposito.id).count()
 		if (cont == 0):
 			cont = 0
 			suma = 0
 		else:
-			suma = Item.objects.filter(deposito_id = deposito.id).aggregate(suma = Sum('qty'))['suma']
+			suma = Producto.objects.filter(deposito_id = deposito.id).aggregate(suma = Sum('qty'))['suma']
 
 		cat.append([deposito.id, deposito.name, deposito.place, cont, suma])
 
@@ -313,14 +328,28 @@ def logs(request):
 	usuario = Usuario.objects.get(id = user.id)
 
 	if (usuario.role == 4):
-		return(redirect('items'))
+		return(redirect('productos'))
 
-	logs = Log.objects.all().order_by('item')
-	ctx = {'pagina':6,
-			'datos':[usuario.role.id, usuario.role.name],
-			'deposito':'(TODOS)',
-			'logs':logs}
-	return(render(request, 'logs.html', ctx))
+	if (request.method == 'GET'):
+		logs = Log.objects.all().order_by('producto')
+		ctx = {'pagina':6,
+				'datos':[usuario.role.id, usuario.role.name],
+				'deposito':'(TODOS)',
+				'logs':logs}
+		return(render(request, 'logs.html', ctx))
+
+	elif (request.method == 'POST'):
+		busq = request.POST['busq']
+		if (busq == ''):
+			logs = Log.objects.all().order_by('producto')
+		else:
+			productos_ids = Producto.objects.filter(name__contains = busq) #.order-by('name')
+			logs = Log.objects.filter(producto_id__in = Subquery(productos_ids.values('id')))
+		ctx = {'pagina':6,
+				'datos':[usuario.role.id, usuario.role.name],
+				'deposito':'(TODOS)',
+				'logs':logs}
+		return(render(request, 'logs.html', ctx))
 
 @login_required
 def log(request, id):
@@ -329,13 +358,13 @@ def log(request, id):
 	usuario = Usuario.objects.get(id = user.id)
 
 	if (usuario.role == 4):
-		return(redirect('items'))
+		return(redirect('s'))
 
-	items = Item.objects.filter(id = id)
-	for i in items:
-		print('...', i.id, i.deposito_id)
-	logs = Log.objects.filter(item_id__in = Subquery(items.values('id')))
-	deposito = Deposito.objects.get(id = items[0].deposito_id)
+	deposito = Deposito.objects.get(id = id)
+	productos = Producto.objects.filter(deposito_id = id)
+	for p in productos:
+		print('p', p.id, p.name)
+	logs = Log.objects.filter(producto_id__in = Subquery(productos.values('id')))
 	ctx = {'pagina':6,
 			'datos':[usuario.role.id, usuario.role.name],
 			'deposito':'(' + deposito.name + ')', 
@@ -343,11 +372,11 @@ def log(request, id):
 	return(render(request, 'logs.html', ctx))
 
 @login_required
-def eliminar_item(request, id):
+def eliminar_producto(request, id):
 
 	user = request.user
 	usuario = Usuario.objects.get(id = user.id)
 
-	item = Item.objects.filter(id = id)
-	item.delete()
-	return(redirect('items'))
+	producto = Producto.objects.filter(id = id)
+	producto.delete()
+	return(redirect('productos'))

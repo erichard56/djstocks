@@ -94,8 +94,8 @@ select {
 	border:1px solid #bbb;
 	color:#aaa;
 	-webkit-appearance:none;
-	-moz-appareance:none;
-	appareance:none;
+	-moz-appearance:none;
+	appearance:none;
 	position:absolute;
 	right:0px;
 	top:0px;

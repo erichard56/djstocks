@@ -20,8 +20,7 @@ class Rol(models.Model):
 	def __str__(self):
 		return(self.name)
 
-
-class Item(models.Model):
+class Producto(models.Model):
 	name = models.CharField(max_length = 200)
 	descrp = models.CharField(max_length = 400)
 	deposito = models.ForeignKey(Deposito, on_delete = models.CASCADE)
@@ -43,7 +42,7 @@ class Tipmov(models.Model):
 
 class Log(models.Model):
 	type = models.ForeignKey(Tipmov, on_delete=models.CASCADE)
-	item = models.ForeignKey(Item, on_delete=models.CASCADE)
+	producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
 	fromqty = models.IntegerField()
 	toqty = models.IntegerField()
 	fromprice = models.DecimalField(max_digits=15, decimal_places=2)

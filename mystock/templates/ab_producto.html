@@ -12,14 +12,13 @@
 			{% endif %}
 
 			<div class="center">
-				<!-- <div class="new-item form"> -->
 				<div class="form-group"></div>
-					<form method="post" action="" name="new-item" enctype='multipart/form-data'>
+					<form method="post" action="" name="new-producto" enctype='multipart/form-data'>
 						{% csrf_token %}
 						<br>
 						{{ form.as_p }}
 						<br>
-						<input type="submit" name="item-submit" class="ni btn blue" value="Guardar datos" />
+						<input type="submit" name="producto-submit" class="ni btn blue" value="Guardar datos" />
 						<br><br>
 					</form>
 				</div>
@@ -32,5 +31,4 @@
 
 {% endblock %}
 
-</body>
-</html>
+
