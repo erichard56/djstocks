@@ -209,7 +209,7 @@ def productos(request, signo, desde):
 	elif (request.method == 'POST'):
 		busq = request.POST['busq']
 		if (busq == ''):
-			productos = Producto.objects.all().order_by('id')[desde:hasta]
+			productos = Producto.objects.all().order_by('name')[desde:hasta]
 		else:
 			productos = Producto.objects.filter(name__contains = busq).order_by('id')
 		ctx = {'pagina':3,
@@ -358,33 +358,50 @@ def deposito_eliminar(request, id):
 	return(redirect('depositos'))
 
 @login_required
-def logs(request):
-
+def logs(request, signo, desde):
+	cantidad = 50
 	user = request.user
 	usuario = Usuario.objects.get(id = user.id)
 
 	if (usuario.role == 4):
-		return(redirect('productos'))
+		return(redirect('productos/1/0'))
+
+	if (desde == 0):
+		hasta = cantidad
+	else:
+		if (signo == 1):
+			hasta = desde + cantidad
+		else:
+			hasta = desde - cantidad
+	cant = Producto.objects.count()
+	if (hasta > cant):
+		hasta = cant
+	desde = hasta - cantidad
+	if (hasta <= 0):
+		desde = 0
+		hasta = desde + cantidad
 
 	if (request.method == 'GET'):
-		logs = Log.objects.all().order_by('producto')
+		logs = Log.objects.all().order_by('producto')[desde:hasta]
 		ctx = {'pagina':6,
 				'datos':[usuario.role.id, usuario.role.name],
 				'deposito':'(TODOS)',
-				'logs':logs}
+				'logs':logs,
+				'desde':hasta}
 		return(render(request, 'logs.html', ctx))
 
 	elif (request.method == 'POST'):
 		busq = request.POST['busq']
 		if (busq == ''):
-			logs = Log.objects.all().order_by('producto')
+			logs = Log.objects.all().order_by('producto')[desde:hasta]
 		else:
 			productos_ids = Producto.objects.filter(name__contains = busq) #.order-by('name')
 			logs = Log.objects.filter(producto_id__in = Subquery(productos_ids.values('id')))
 		ctx = {'pagina':6,
 				'datos':[usuario.role.id, usuario.role.name],
 				'deposito':'(TODOS)',
-				'logs':logs}
+				'logs':logs,
+				'desde':hasta}
 		return(render(request, 'logs.html', ctx))
 
 @login_required
@@ -398,11 +415,12 @@ def log(request, id):
 
 	deposito = Deposito.objects.get(id = id)
 	productos = Producto.objects.filter(deposito_id = id)
-	logs = Log.objects.filter(producto_id__in = Subquery(productos.values('id')))
+	logs = Log.objects.filter(producto_id__in = Subquery(productos.values('id'))).order_by('id')[:50]
 	ctx = {'pagina':6,
 			'datos':[usuario.role.id, usuario.role.name],
 			'deposito':'(' + deposito.name + ')', 
-			'logs':logs}
+			'logs':logs,
+			'desde':50}
 	return(render(request, 'logs.html', ctx))
 
 @login_required

@@ -78,7 +78,7 @@
 
 					<!-- // Add Producto only for Admin, General Supervisor and Supervisor -->
 					{% if datos.0 == 1 or datos.0e == 2 or datos.0 == 3 %}
-						<li {% if pagina == 6 %} class="active" {% endif %}><a href="{% url 'logs' %}" title="Logs"><i class="fa fa-file-text-o"></i> Logs</a></li>
+						<li {% if pagina == 6 %} class="active" {% endif %}><a href="{% url 'logs' 1 0 %}" title="Logs"><i class="fa fa-file-text-o"></i> Logs</a></li>
 					{% endif %}
 
 					<li {% if pagina == 7 %} class="active" {% endif %}><a href="{% url 'depositos' %}" title="Depósitos"><i class="fa fa-folder"></i> Depósitos</a></li>

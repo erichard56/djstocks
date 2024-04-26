@@ -16,7 +16,7 @@ urlpatterns = [
     path('producto_ab/<int:id>', producto_ab, name = 'producto_ab'),
     path('producto_detalle/<int:id>', producto_detalle, name = 'producto_detalle'),
     path('producto_eliminar/<int:id>', producto_eliminar, name = 'producto_eliminar'),
-    path('logs', logs, name = 'logs'),
+    path('logs/<int:signo>/<int:desde>', logs, name = 'logs'),
     path('log/<int:id>', log, name = 'log'),
     path('corrige_imagen/', corrige_imagen, name = 'corrige_imagen'),
 ]

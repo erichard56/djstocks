@@ -53,6 +53,19 @@
 	</table>
 </div>
 
+<div id="pagination">
+	<div class="fright" style="height:5px; margin-right:55px;">
+		{% if rango != 0 %}
+			<div class="prev" onclick="window.location.href='/productos/2/{{ desde }}' ;">
+				<i class="fa fa-caret-left"></i>
+			</div>
+		{% endif %}
+		<input type="hidden" name="cantidad" id="cantidad" readonly="readonly" placeholder="{{ desde }}"/>
+		<div class="next" onclick="window.location.href='/productos/1/{{ desde }}' ;">
+			<i class="fa fa-caret-right"></i></div>
+	</div>
+</div>
+
 <div class="clear" style="margin-bottom:40px;"></div>
 <div class="border" style="margin-bottom:30px;"></div>
 		
