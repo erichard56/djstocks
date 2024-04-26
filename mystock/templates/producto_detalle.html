@@ -1,0 +1,28 @@
+{% extends 'header.html' %}
+
+{% load static %}
+
+{% block cuerpo %}
+		
+<div class="wrapper-pad">
+	<h2>Producto Detalles</h2>
+		<div class="center">
+			<div class="form">
+				Item ID: {{ producto.id }} <br> <br>
+				Item Nombre: {{ producto.name }} <br /><br />
+				Item Descripción: {{ producto.descrp }} <br /><br />
+				Item Depósito: {{ producto.deposito }} <br /><br />
+				Item Cantidad: {{ producto.qty }} <br /><br />
+				Precio de cada item: {{ producto.price }} <br /><br />
+				Precio de Venta de cada item: {{ producto.price_venta }} <br /><br />
+				<img src="{% get_media_prefix %}{{ producto.imagen }}" height='100' width='100' />
+				<br /><br />
+			</div>
+		</div>
+	</div>
+		
+	<div class="clear" style="margin-bottom:40px;"></div>
+	<div class="border" style="margin-bottom:30px;"></div>
+</div>
+
+{% endblock %}

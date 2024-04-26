@@ -1,0 +1,23 @@
+{% extends 'header.html' %}
+
+{% load static %}
+
+{% block cuerpo %}
+		
+<div class="wrapper-pad">
+	<h2>Producto Detalles</h2>
+		<div class="center">
+			<div class="form">
+				ID: {{ deposito.id }} <br> <br>
+				Nombre del Depósito: {{ deposito.name }} <br /><br />
+				Lugar del Depósito: {{ deposito.place }} <br /><br />
+				Descripción Depósito: {{ deposito.descrp }} <br /><br />
+			</div>
+		</div>
+	</div>
+		
+	<div class="clear" style="margin-bottom:40px;"></div>
+	<div class="border" style="margin-bottom:30px;"></div>
+</div>
+
+{% endblock %}

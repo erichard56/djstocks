@@ -69,10 +69,10 @@
 
 					<!-- // Add Producto only for Admin, General Supervisor and Supervisor -->
 					{% if datos.0 == 1 or datos.0 == 2 or datos.0 == 3 %}
-						<li {% if pagina == 2 %} class="active" {% endif %}><a href="{% url 'ab_producto' 0 %}" title="New Producto"><i class="fa fa-plus"></i> Nuevo producto</a></li>
+						<li {% if pagina == 2 %} class="active" {% endif %}><a href="{% url 'producto_ab' 0 %}" title="New Producto"><i class="fa fa-plus"></i> Nuevo producto</a></li>
 					{% endif %}
 
-					<li {% if pagina == 3 %} class="active" {% endif %}><a href="{% url 'productos' %}" title="Productos"><i class="fa fa-list-ul"></i> Productos</a></li>
+					<li {% if pagina == 3 %} class="active" {% endif %}><a href="{% url 'productos' 1 0 %}" title="Productos"><i class="fa fa-list-ul"></i> Productos</a></li>
 					<li {% if pagina == 4 %} class="active" {% endif %}><a href="check-in.php" title="Check-In Producto"><i class="fa fa-arrow-down"></i> Ingresos</a></li>
 					<li {% if pagina == 5 %} class="active" {% endif %}><a href="check-out.php" title="Check-Out Producto"><i class="fa fa-arrow-up"></i> Salidas</a></li>
 
@@ -81,7 +81,7 @@
 						<li {% if pagina == 6 %} class="active" {% endif %}><a href="{% url 'logs' %}" title="Logs"><i class="fa fa-file-text-o"></i> Logs</a></li>
 					{% endif %}
 
-					<li {% if pagina == 7 %} class="active" {% endif %}><a href="{% url 'deposito' %}" title="Depósitos"><i class="fa fa-folder"></i> Depósitos</a></li>
+					<li {% if pagina == 7 %} class="active" {% endif %}><a href="{% url 'depositos' %}" title="Depósitos"><i class="fa fa-folder"></i> Depósitos</a></li>
 				</ul>
 			</div>
 

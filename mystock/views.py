@@ -7,11 +7,10 @@ from mystock.models import Log, Producto, Usuario, Deposito
 from mystock.forms import LoginForm, ProductoForm, DepositoForm
 from django.db.models import Sum, F
 from django.conf import settings
-from os.path import exists
 from datetime import datetime
 from PIL import Image
-from io import BytesIO
 from django.db.models import Subquery
+from pathlib import Path
 
 # Create your views here.
 
@@ -110,7 +109,7 @@ def home(request):
 		general_warehouse_productos = 0
 
 #general_warehouse_value
-	general_warehouse_value = Producto.objects.aggregate(general_warehouse_value = Sum((F('qty') - F('price'))))['general_warehouse_value']
+	general_warehouse_value = Producto.objects.aggregate(general_warehouse_value = Sum((F('qty') * F('price'))))['general_warehouse_value']
 	if (general_warehouse_value is None):
 		general_warehouse_value = 0
 
@@ -175,38 +174,52 @@ def sign_out(request):
 	return redirect('/login/')
 
 @login_required
-def productos(request):
+def productos(request, signo, desde):
+	cantidad = 50
 	user = request.user
 	usuario = Usuario.objects.get(id = user.id)
 
 	if(usuario.role == 4):
-		return(redirect('productos/'))
+		return(redirect('productos/1/0'))
+
+	if (desde == 0):
+		hasta = cantidad
+	else:
+		if (signo == 1):
+			hasta = desde + cantidad
+		else:
+			hasta = desde - cantidad
+	cant = Producto.objects.count()
+	if (hasta > cant):
+		hasta = cant
+	desde = hasta - cantidad
+	if (hasta <= 0):
+		desde = 0
+		hasta = desde + cantidad
 
 	if (request.method == 'GET'):
-		# // Search query
-		productos = Producto.objects.all().order_by('name')
+		productos = Producto.objects.all().order_by('id')[desde:hasta]
 
 		ctx = {'pagina':3,
 			'datos':[usuario.role.id, usuario.role.name],
-			'productos':productos}
+			'productos':productos,
+			'desde':hasta}	# desde
 		return(render(request, 'productos.html', ctx))
 
 	elif (request.method == 'POST'):
 		busq = request.POST['busq']
 		if (busq == ''):
-			productos = Producto.objects.all().order_by('name')
+			productos = Producto.objects.all().order_by('id')[desde:hasta]
 		else:
-			productos = Producto.objects.filter(name__contains = busq).order_by('name')
-		for p in productos:
-			print('p', p.id, p.name)
-
+			productos = Producto.objects.filter(name__contains = busq).order_by('id')
 		ctx = {'pagina':3,
 			'datos':[usuario.role.id, usuario.role.name],
-			'productos':productos}
+			'productos':productos,
+			'desde':hasta}	# desde
 		return(render(request, 'productos.html', ctx))
 
 @login_required
-def ab_producto(request, id):
+def producto_ab(request, id):
 	user = request.user
 	usuario = Usuario.objects.get(id = user.id)
 
@@ -226,7 +239,7 @@ def ab_producto(request, id):
 			'datos':[usuario.role.id, usuario.role.name],
 			'id':id, 
 			'form':form}
-		return(render(request, 'ab_producto.html', ctx))
+		return(render(request, 'producto_ab.html', ctx))
 
 	elif (request.method == 'POST'):
 		form = ProductoForm(request.POST, request.FILES)
@@ -249,13 +262,26 @@ def ab_producto(request, id):
 				print('error', e)
 	return(redirect('productos'))
 
-
-def deposito(request):
+@login_required
+def producto_detalle(request, id):
 	user = request.user
 	usuario = Usuario.objects.get(id = user.id)
 
 	if(usuario.role == 4):
 		return(redirect('productos/'))
+
+	producto = Producto.objects.get(pk = id)
+	ctx = {'pagina':16,
+		'datos':[usuario.role.id, usuario.role.name],
+		'producto':producto}
+	return(render(request, 'producto_detalle.html', ctx))
+
+def depositos(request):
+	user = request.user
+	usuario = Usuario.objects.get(id = user.id)
+
+	if(usuario.role == 4):
+		return(redirect('productos/0/0'))
 
 	cat = []
 	depositos = Deposito.objects.all()
@@ -275,13 +301,13 @@ def deposito(request):
 	return(render(request, 'deposito.html', ctx))
 
 @login_required
-def ab_deposito(request, id):
+def deposito_ab(request, id):
 	user = request.user
 	usuario = Usuario.objects.get(id = user.id)
 
 	# // Only Admin and General Supervisor can edit depositos
 	if(usuario.role.id != 1 and usuario.role.id != 2):
-		return(redirect('deposito'))
+		return(redirect('depositos'))
 
 	if (request.method == 'GET'):
 		if (id == 0):
@@ -293,7 +319,7 @@ def ab_deposito(request, id):
 			'datos':[usuario.role.id, usuario.role.name],
 			'id':id,
 			'form':form }
-		return(render(request, 'ab_deposito.html', ctx))
+		return(render(request, 'deposito_ab.html', ctx))
 
 	elif (request.method == 'POST'):
 		form = DepositoForm(request.POST)
@@ -308,18 +334,28 @@ def ab_deposito(request, id):
 				deposito.descrp = request.POST['descrp']
 				deposito.save()
 
-	return(redirect('deposito'))
-
+	return(redirect('depositos'))
 
 @login_required
-def eliminar_deposito(request, id):
+def deposito_detalle(request, id):
+	user = request.user
+	usuario = Usuario.objects.get(id = user.id)
+
+	deposito = Deposito.objects.get(pk = id)
+	ctx = {'pagina':15,
+		'datos':[usuario.role.id, usuario.role.name],
+		'deposito':deposito }
+	return(render(request, 'deposito_detalle.html', ctx))
+
+@login_required
+def deposito_eliminar(request, id):
 
 	user = request.user
 	usuario = Usuario.objects.get(id = user.id)
 
 	deposito = Deposito.objects.get(id = id)
 	deposito.delete()
-	return(redirect('deposito'))
+	return(redirect('depositos'))
 
 @login_required
 def logs(request):
@@ -362,8 +398,6 @@ def log(request, id):
 
 	deposito = Deposito.objects.get(id = id)
 	productos = Producto.objects.filter(deposito_id = id)
-	for p in productos:
-		print('p', p.id, p.name)
 	logs = Log.objects.filter(producto_id__in = Subquery(productos.values('id')))
 	ctx = {'pagina':6,
 			'datos':[usuario.role.id, usuario.role.name],
@@ -372,7 +406,7 @@ def log(request, id):
 	return(render(request, 'logs.html', ctx))
 
 @login_required
-def eliminar_producto(request, id):
+def producto_eliminar(request, id):
 
 	user = request.user
 	usuario = Usuario.objects.get(id = user.id)
@@ -380,3 +414,15 @@ def eliminar_producto(request, id):
 	producto = Producto.objects.filter(id = id)
 	producto.delete()
 	return(redirect('productos'))
+
+
+@login_required
+def corrige_imagen(request):
+	productos = Producto.objects.all()
+	for producto in productos:
+		archivo = 'E:/Desarrollos/mStocks/djstocks/djstocks/media/' + producto.imagen.name
+		if (not Path(archivo).exists()):
+			print('no existe', producto.imagen.name)
+			# producto.imagen.name = 'images/mStocks.jpg'
+			# producto.save()
+	return(redirect('depositos'))
